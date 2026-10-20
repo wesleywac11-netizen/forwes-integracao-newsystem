@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: Integração Atendente IA Forwes x ERP NewSystem
+  version: 1.0.0-preliminar
+  description: |
+    Proposta de contrato entre o Atendente IA (Forwes) e o ERP NewSystem.
+    Lista apenas o que o agente precisa ler e gravar no ERP.
+    Se o ERP já tiver endpoints equivalentes, o agente é adaptado a eles.
+servers:
+  - url: https://api.exemplo-newsystem.net.br
+    description: Endereço ilustrativo. A NewSystem define o real.
+security:
+  - tokenLojista: []
+
+paths:
+  /v1/produtos:
+    get:
+      summary: Buscar produtos por nome ou código
+      parameters:
+        - name: busca
+          in: query
+          required: true
+          schema: { type: string }
+          example: golden adulto
+      responses:
+        "200":
+          description: Produtos encontrados (lista vazia se nenhum)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  itens:
+                    type: array
+                    items: { $ref: "#/components/schemas/Produto" }
+        "401": { $ref: "#/components/responses/NaoAutorizado" }
+
+  /v1/clientes:
+    get:
+      summary: Reconhecer o cliente pelo telefone do WhatsApp
+      parameters:
+        - name: telefone
+          in: query
+          required: true
+          description: Formato internacional, só dígitos
+          schema: { type: string }
+          example: "5527999990000"
+      responses:
+        "200":
+          description: Cliente encontrado (lista vazia = cliente novo)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  itens:
+                    type: array
+                    items: { $ref: "#/components/schemas/Cliente" }
+        "401": { $ref: "#/components/responses/NaoAutorizado" }
+
+  /v1/clientes/{id}/compras:
+    get:
+      summary: Histórico de compras em todos os canais (alimenta a recompra)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          example: C-1043
+        - name: desde
+          in: query
+          required: false
+          schema: { type: string, format: date }
+          example: "2026-04-01"
+      responses:
+        "200":
+          description: Compras do cliente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  compras:
+                    type: array
+                    items: { $ref: "#/components/schemas/Compra" }
+        "404": { description: Cliente não existe }
+
+  /v1/pedidos:
+    post:
+      summary: Criar pedido confirmado pelo cliente no WhatsApp
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Mesmo valor em reenvio = mesmo pedido, sem duplicar
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NovoPedido" }
+      responses:
+        "201":
+          description: Pedido criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PedidoCriado" }
+        "409":
+          description: Estoque insuficiente no momento da criação
+        "422":
+          description: Dados inválidos (produto inexistente, quantidade zero)
+
+  /v1/pedidos/{id}:
+    patch:
+      summary: Mudar o status do pedido
+      description: Ao virar "pago", o ERP baixa o estoque e segue o fluxo fiscal normal.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          example: P-55120
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [pago, cancelado] }
+      responses:
+        "200": { description: Status atualizado }
+        "404": { description: Pedido não existe }
+
+components:
+  securitySchemes:
+    tokenLojista:
+      type: http
+      scheme: bearer
+      description: Um token por lojista, gerado no painel do ERP e revogável.
+
+  responses:
+    NaoAutorizado:
+      description: Token ausente, inválido ou revogado
+
+  schemas:
+    Produto:
+      type: object
+      properties:
+        id: { type: string, example: "8812" }
+        nome: { type: string, example: Ração Golden Adulto Frango 15kg }
+        preco: { type: number, format: float, example: 172.90 }
+        estoque: { type: number, example: 7 }
+        unidade: { type: string, example: UN }
+        ativo: { type: boolean, example: true }
+    Cliente:
+      type: object
+      properties:
+        id: { type: string, example: C-1043 }
+        nome: { type: string, example: Mariana Souza }
+        telefone: { type: string, example: "5527999990000" }
+        endereco:
+          type: object
+          properties:
+            bairro: { type: string, example: Jardim Camburi }
+            logradouro: { type: string, example: "Rua Exemplo, 100" }
+    Compra:
+      type: object
+      properties:
+        data: { type: string, format: date, example: "2026-09-02" }
+        produto_id: { type: string, example: "8812" }
+        quantidade: { type: number, example: 1 }
+        canal: { type: string, enum: [PDV, whatsapp, ecommerce, outro] }
+    NovoPedido:
+      type: object
+      required: [cliente_id, canal, itens, pagamento]
+      properties:
+        cliente_id: { type: string, example: C-1043 }
+        canal: { type: string, example: whatsapp }
+        itens:
+          type: array
+          items:
+            type: object
+            required: [produto_id, quantidade]
+            properties:
+              produto_id: { type: string, example: "8812" }
+              quantidade: { type: number, example: 1 }
+              preco_unit: { type: number, example: 172.90 }
+        entrega:
+          type: object
+          properties:
+            tipo: { type: string, enum: [entrega, retirada] }
+            bairro: { type: string, example: Jardim Camburi }
+            taxa: { type: number, example: 10.00 }
+        pagamento: { type: string, enum: [pix], example: pix }
+    PedidoCriado:
+      type: object
+      properties:
+        pedido_id: { type: string, example: P-55120 }
+        status: { type: string, example: aguardando_pagamento }
+        total: { type: number, example: 182.90 }

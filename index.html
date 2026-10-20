@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kit de Integração NewSystem</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: documento técnico de duas colunas (índice fixo + corpo), vira uma coluna no celular */
+:root{
+  --bg:#f6f7f8; --surface:#ffffff; --fg:#17202a; --muted:#56616d; --line:#dfe3e8;
+  --accent:#1f6b52; --accent-soft:#e3f0ea; --code-bg:#121a22; --code-fg:#dbe5ee;
+  --ok:#1f6b52; --ok-bg:#e3f0ea; --warn:#8a5a00; --warn-bg:#fbf0d9; --next:#3c4f9c; --next-bg:#e6e9f7;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1418; --surface:#161d23; --fg:#e6ebef; --muted:#9aa6b2; --line:#2a333c;
+  --accent:#5cc49b; --accent-soft:#183a2e; --code-bg:#0a0e12; --code-fg:#d6e1ea;
+  --ok:#5cc49b; --ok-bg:#183a2e; --warn:#f0c46a; --warn-bg:#3a2e14; --next:#9fb0f0; --next-bg:#1f2747;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1418; --surface:#161d23; --fg:#e6ebef; --muted:#9aa6b2; --line:#2a333c;
+  --accent:#5cc49b; --accent-soft:#183a2e; --code-bg:#0a0e12; --code-fg:#d6e1ea;
+  --ok:#5cc49b; --ok-bg:#183a2e; --warn:#f0c46a; --warn-bg:#3a2e14; --next:#9fb0f0; --next-bg:#1f2747;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px;padding-block:48px 80px}
+nav.toc{position:sticky;top:calc(24px + env(safe-area-inset-top,0px));align-self:start;font-size:14px}
+nav.toc p{font-family:var(--f-display);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin:0 0 12px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:t}
+nav.toc a{color:var(--muted);text-decoration:none;display:block;padding:2px 0 2px 12px;border-left:2px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--fg);border-left-color:var(--accent);outline:none}
+main{min-width:0}
+header.cover{border-bottom:1px solid var(--line);padding-bottom:32px;margin-bottom:8px}
+.eyebrow{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--accent);margin:0 0 12px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,5vw,48px);line-height:1.08;margin:0 0 16px;text-wrap:balance;letter-spacing:-.01em}
+.lede{font-size:19px;color:var(--muted);max-width:62ch;margin:0 0 24px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 28px;font-size:14px;color:var(--muted);margin:0;padding:0;list-style:none}
+.meta b{color:var(--fg);font-weight:600}
+section{padding-top:48px}
+h2{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.2;margin:0 0 6px;text-wrap:balance}
+h2 + .sub{color:var(--muted);margin:0 0 20px;max-width:65ch}
+h3{font-family:var(--f-display);font-weight:700;font-size:18px;margin:28px 0 8px}
+p,li{max-width:68ch}
+ul.plain{padding-left:20px;margin:8px 0}
+ul.plain li{margin:4px 0}
+a{color:var(--accent)}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:20px 0}
+.callout.key{border-color:var(--accent)}
+.callout p{margin:0}
+.callout p + p{margin-top:10px}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.cell{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;min-width:0}
+.cell h4{font-family:var(--f-display);font-size:16px;margin:0 0 6px}
+.cell p{margin:0;color:var(--muted);font-size:15px}
+
+.chip{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.02em;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.next{background:var(--next-bg);color:var(--next)}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-top:16px}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.mono{font-family:var(--f-mono);font-size:13.5px;white-space:nowrap}
+
+/* Diagrama de arquitetura em HTML (funciona na página e no PDF) */
+.arch{display:grid;grid-template-columns:minmax(0,1fr) 72px minmax(0,1.15fr) 72px minmax(0,1fr);align-items:center;margin-top:20px}
+.node{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.node.hub{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.node .t{font-family:var(--f-display);font-weight:700;font-size:15px;margin:0 0 4px}
+.node .s{font-size:13px;color:var(--muted);margin:0 0 8px}
+.node ul{margin:0;padding-left:16px;font-size:13.5px}
+.node li{margin:2px 0}
+.link{display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:center}
+.link .ln{width:100%;height:2px;background:var(--accent);position:relative}
+.link .ln::before,.link .ln::after{content:"";position:absolute;top:-4px;border:5px solid transparent}
+.link .ln::after{right:-2px;border-left-color:var(--accent)}
+.link .ln::before{left:-2px;border-right-color:var(--accent)}
+
+.steps{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px dashed var(--line);max-width:none}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:800;font-size:15px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.steps b{display:block}
+.steps .who{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+
+.ep{margin-top:22px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.ep-h{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.verb{font-family:var(--f-mono);font-weight:500;font-size:12px;padding:2px 8px;border-radius:4px;background:var(--accent);color:var(--surface)}
+.path{font-family:var(--f-mono);font-size:14px;word-break:break-all}
+.ep-h .why{flex-basis:100%;font-size:14px;color:var(--muted)}
+pre{margin:0;background:var(--code-bg);color:var(--code-fg);font-family:var(--f-mono);font-size:13px;line-height:1.55;padding:16px;overflow-x:auto}
+pre .c{color:#7f93a6}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.pair > div{min-width:0}
+.pair > div + div{border-left:1px solid #26313b}
+.lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8ea2b4;background:var(--code-bg);padding:10px 16px 0}
+
+.demo{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.demo a{display:flex;flex-direction:column;gap:2px;flex:1 1 220px;padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--fg)}
+.demo a:hover,.demo a:focus-visible{border-color:var(--accent);outline:none}
+.demo a span{font-size:14px;color:var(--muted)}
+.demo a b{font-family:var(--f-display)}
+
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:0;padding-block:32px 64px}
+  nav.toc{display:none}
+  .arch{grid-template-columns:minmax(0,1fr);gap:0}
+  .link{flex-direction:row;justify-content:center;height:56px}
+  .link .ln{width:2px;height:100%}
+  .link .ln::after{right:auto;left:-4px;top:auto;bottom:-2px;border-left-color:transparent;border-top-color:var(--accent)}
+  .link .ln::before{left:-4px;top:-2px;border-right-color:transparent;border-bottom-color:var(--accent)}
+  .grid2,.pair{grid-template-columns:minmax(0,1fr)}
+  .pair > div + div{border-left:0;border-top:1px solid #26313b}
+}
+@media print{
+  nav.toc{display:none}
+  .wrap{grid-template-columns:minmax(0,1fr);padding-block:0}
+  section{break-inside:auto}
+  .ep,.cell,.node,.callout{break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="Índice">
+  <p>Neste documento</p>
+  <ol>
+    <li><a href="#resumo">Resumo</a></li>
+    <li><a href="#modulo">O que o módulo faz</a></li>
+    <li><a href="#arquitetura">Como se encaixa no ERP</a></li>
+    <li><a href="#fluxo">Um pedido de ponta a ponta</a></li>
+    <li><a href="#api">Contrato de integração</a></li>
+    <li><a href="#seguranca">Segurança e LGPD</a></li>
+    <li><a href="#revenda">Implantação e revenda</a></li>
+    <li><a href="#piloto">Plano do piloto</a></li>
+    <li><a href="#demos">Testar agora</a></li>
+    <li><a href="#perguntas">O que precisamos de vocês</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="cover">
+  <p class="eyebrow">Forwes · Proposta técnica para NewSystem</p>
+  <h1>Atendente IA no WhatsApp como módulo do ERP NewSystem</h1>
+  <p class="lede">Um módulo que o lojista liga no painel e passa a vender pelo WhatsApp com o estoque, os preços e os clientes que já estão no ERP. Este documento mostra o que existe hoje, como a integração funciona e o que precisamos do time de vocês para fazer um piloto.</p>
+  <ul class="meta">
+    <li><b>Versão</b> 1.0 preliminar</li>
+    <li><b>Data</b> 20/10/2026</li>
+    <li><b>Autor</b> Wesley · Forwes</li>
+    <li><b>Leitores</b> Diretoria e time de desenvolvimento</li>
+  </ul>
+</header>
+
+<section id="resumo">
+  <h2>Resumo para a diretoria</h2>
+  <p class="sub">Em uma frase: o cliente da NewSystem passa a ter um vendedor no WhatsApp que conhece o estoque dele.</p>
+  <div class="grid2">
+    <div class="cell"><h4>Para o lojista</h4><p>Atende e fecha venda no WhatsApp a qualquer hora, sem digitar preço nem conferir estoque. Chama de volta o cliente quando chega a hora de recomprar.</p></div>
+    <div class="cell"><h4>Para a NewSystem</h4><p>Um módulo novo para a lista de adicionais que vocês já vendem (como NF-e, PDV e e-commerce), com receita mensal recorrente sobre a base atual.</p></div>
+    <div class="cell"><h4>Por que o ERP é o lugar certo</h4><p>O agente fica melhor com o dado do ERP: estoque real, preço atualizado e histórico de compras feitas também no balcão (PDV), não só no WhatsApp.</p></div>
+    <div class="cell"><h4>Esforço do lado de vocês</h4><p>Expor poucos pontos de acesso (consultar produto, cliente e histórico; criar pedido). O agente, a IA e o WhatsApp ficam com a Forwes.</p></div>
+  </div>
+  <div class="callout key">
+    <p><b>Modelo comercial:</b> a combinar. Os formatos possíveis são mensalidade por lojista ativo, divisão de receita sobre o adicional ou marca própria (o módulo aparece com o nome NewSystem).</p>
+  </div>
+</section>
+
+<section id="modulo">
+  <h2>O que o módulo faz</h2>
+  <p class="sub">A primeira versão foi construída para pet shop (venda e recompra de ração) e está em implantação numa loja em Vitória-ES. A lógica de venda serve para qualquer varejo com produto de reposição. Levar para outro ramo pede ajuste de regras e mensagens, não reconstrução.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Função</th><th>Como funciona</th><th>Situação</th></tr></thead>
+    <tbody>
+      <tr><td>Atendimento e venda</td><td>Conversa em português natural, consulta produto e estoque, monta o pedido e mostra o resumo para o cliente confirmar.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Preço e total pelo sistema</td><td>A IA conversa; preço, taxa, pedido mínimo e total são calculados por regra fixa, nunca pela IA.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Entrega por bairro</td><td>Tabela de bairros com taxa e pedido mínimo editável pelo lojista; guarda o endereço do cliente.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Pagamento por Pix</td><td>Envia a chave Pix na hora; hoje o lojista confirma o recebimento.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Aviso ao lojista</td><td>Cada pedido chega no WhatsApp do lojista com nome do cliente e itens. Falhas da IA ou do sistema também geram aviso.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Recompra automática</td><td>Calcula quando o produto do cliente deve acabar e oferece a reposição antes.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Relatório mensal</td><td>Painel com vendas pelo WhatsApp e produtos mais vendidos, enviado por WhatsApp e e-mail.</td><td><span class="chip ok">Pronto</span></td></tr>
+      <tr><td>Leitura do ERP no lugar da planilha</td><td>Hoje o estoque vem de uma planilha do lojista. Com a NewSystem, passa a vir da API do ERP.</td><td><span class="chip warn">Objeto desta proposta</span></td></tr>
+      <tr><td>Atendente por voz</td><td>Atende ligação, marca e remarca horário. Existe como demonstração; a versão real é o próximo módulo.</td><td><span class="chip next">Próximo</span></td></tr>
+    </tbody>
+  </table></div>
+  <h3>Tecnologia</h3>
+  <ul class="plain">
+    <li>Orquestração em fluxos n8n, hospedados em nuvem gerenciada.</li>
+    <li>Modelo de IA da família Gemini (Google), com custo por mensagem na casa de frações de centavo.</li>
+    <li>Postgres para histórico e relatório; Redis para estado curto da conversa.</li>
+    <li>WhatsApp por provedor de API conectado ao número do lojista. A API oficial da Meta é o caminho recomendado para escala.</li>
+  </ul>
+</section>
+
+<section id="arquitetura">
+  <h2>Como se encaixa no ERP</h2>
+  <p class="sub">O ERP continua sendo a fonte da verdade. O agente só lê o que precisa e grava o pedido de volta.</p>
+  <div class="arch" role="img" aria-label="Cliente no WhatsApp conversa com o Atendente IA da Forwes, que lê e grava no ERP NewSystem">
+    <div class="node">
+      <p class="t">Cliente final</p>
+      <p class="s">WhatsApp do lojista</p>
+      <ul><li>Pergunta preço</li><li>Faz o pedido</li><li>Paga no Pix</li></ul>
+    </div>
+    <div class="link"><div class="ln"></div>mensagens</div>
+    <div class="node hub">
+      <p class="t">Atendente IA · Forwes</p>
+      <p class="s">Um ambiente por lojista</p>
+      <ul><li>Entende a conversa</li><li>Aplica regras de preço e entrega</li><li>Agenda a recompra</li><li>Avisa o lojista</li></ul>
+    </div>
+    <div class="link"><div class="ln"></div>API HTTPS</div>
+    <div class="node">
+      <p class="t">ERP NewSystem</p>
+      <p class="s">Fonte da verdade</p>
+      <ul><li>Produtos, preço, estoque</li><li>Clientes e histórico</li><li>Pedido, baixa, NFC-e</li></ul>
+    </div>
+  </div>
+  <div class="callout">
+    <p><b>Plano B, se a API ainda não existir:</b> o piloto pode começar com uma exportação diária de produtos e estoque (CSV ou planilha) gerada pelo ERP. O agente já funciona assim hoje. A API entra depois, sem mudar nada para o lojista.</p>
+  </div>
+</section>
+
+<section id="fluxo">
+  <h2>Um pedido de ponta a ponta</h2>
+  <p class="sub">O que acontece entre a primeira mensagem e a venda registrada no ERP.</p>
+  <ol class="steps">
+    <li><div><b>Cliente manda "tem a Golden adulto de 15 kg?"</b><span class="who">WhatsApp → Atendente</span></div></li>
+    <li><div><b>Atendente identifica o cliente pelo telefone e consulta o produto</b><span class="who">Atendente → ERP · GET /clientes · GET /produtos</span></div></li>
+    <li><div><b>Responde com preço e disponibilidade, pergunta entrega ou retirada</b><span class="who">Atendente → WhatsApp</span></div></li>
+    <li><div><b>Monta o resumo com taxa do bairro e total; o cliente confirma</b><span class="who">regra fixa, sem IA no cálculo</span></div></li>
+    <li><div><b>Cria o pedido no ERP com status "aguardando pagamento"</b><span class="who">Atendente → ERP · POST /pedidos</span></div></li>
+    <li><div><b>Envia a chave Pix ao cliente e avisa o lojista</b><span class="who">Atendente → WhatsApp</span></div></li>
+    <li><div><b>Pagamento confirmado: pedido vira "pago" e o ERP baixa o estoque</b><span class="who">Atendente → ERP · PATCH /pedidos/{id}</span></div></li>
+    <li><div><b>Semanas depois, o histórico indica que o produto vai acabar e o agente oferece a reposição</b><span class="who">ERP → Atendente · GET /clientes/{id}/compras</span></div></li>
+  </ol>
+</section>
+
+<section id="api">
+  <h2>Contrato de integração</h2>
+  <p class="sub">Versão para ferramentas: <a href="openapi.yaml">openapi.yaml</a> (abre no Swagger Editor ou Postman). Proposta inicial. Se o ERP já tem endpoints parecidos, nós adaptamos o agente a eles; esta lista mostra só o que o agente precisa.</p>
+
+  <h3>Autenticação</h3>
+  <ul class="plain">
+    <li>HTTPS obrigatório.</li>
+    <li>Um token por lojista, gerado no painel do ERP: <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+    <li>Escopo mínimo: leitura de produtos, clientes e compras; criação e atualização de pedidos.</li>
+    <li>Token revogável pelo lojista ou pela NewSystem a qualquer momento.</li>
+  </ul>
+
+  <div class="ep">
+    <div class="ep-h"><span class="verb">GET</span><span class="path">/v1/produtos?busca=golden adulto</span><span class="why">Buscar produto por nome ou código, com preço e estoque atuais.</span></div>
+    <div class="lbl">Resposta 200</div>
+<pre>{
+  "itens": [
+    {
+      "id": "8812",
+      "nome": "Ração Golden Adulto Frango 15kg",
+      "preco": 172.90,
+      "estoque": 7,
+      "unidade": "UN",
+      "ativo": true
+    }
+  ]
+}</pre>
+  </div>
+
+  <div class="ep">
+    <div class="ep-h"><span class="verb">GET</span><span class="path">/v1/clientes?telefone=5527999990000</span><span class="why">Reconhecer o cliente pelo número do WhatsApp. Lista vazia significa cliente novo.</span></div>
+    <div class="lbl">Resposta 200</div>
+<pre>{
+  "itens": [
+    {
+      "id": "C-1043",
+      "nome": "Mariana Souza",
+      "telefone": "5527999990000",
+      "endereco": { "bairro": "Jardim Camburi", "logradouro": "Rua Exemplo, 100" }
+    }
+  ]
+}</pre>
+  </div>
+
+  <div class="ep">
+    <div class="ep-h"><span class="verb">GET</span><span class="path">/v1/clientes/C-1043/compras?desde=2026-04-01</span><span class="why">Histórico de compras em todos os canais (balcão e WhatsApp). Alimenta a recompra.</span></div>
+    <div class="lbl">Resposta 200</div>
+<pre>{
+  "compras": [
+    { "data": "2026-09-02", "produto_id": "8812", "quantidade": 1, "canal": "PDV" },
+    { "data": "2026-08-01", "produto_id": "8812", "quantidade": 1, "canal": "whatsapp" }
+  ]
+}</pre>
+  </div>
+
+  <div class="ep">
+    <div class="ep-h"><span class="verb">POST</span><span class="path">/v1/pedidos</span><span class="why">Criar o pedido confirmado pelo cliente. O cabeçalho <code>Idempotency-Key</code> evita pedido em dobro se a mensagem chegar repetida.</span></div>
+    <div class="pair">
+      <div><div class="lbl">Envio</div>
+<pre>{
+  "cliente_id": "C-1043",
+  "canal": "whatsapp",
+  "itens": [
+    { "produto_id": "8812",
+      "quantidade": 1,
+      "preco_unit": 172.90 }
+  ],
+  "entrega": {
+    "tipo": "entrega",
+    "bairro": "Jardim Camburi",
+    "taxa": 10.00
+  },
+  "pagamento": "pix"
+}</pre></div>
+      <div><div class="lbl">Resposta 201</div>
+<pre>{
+  "pedido_id": "P-55120",
+  "status": "aguardando_pagamento",
+  "total": 182.90
+}
+
+<span class="c">// 409 se o estoque acabou entre a
+// consulta e o pedido: o agente avisa
+// o cliente e oferece alternativa.</span></pre></div>
+    </div>
+  </div>
+
+  <div class="ep">
+    <div class="ep-h"><span class="verb">PATCH</span><span class="path">/v1/pedidos/P-55120</span><span class="why">Mudar o status. Ao virar "pago", o ERP baixa o estoque e pode emitir a NFC-e pelo fluxo normal de vocês.</span></div>
+<pre>{ "status": "pago" }      <span class="c">// ou "cancelado"</span></pre>
+  </div>
+
+  <h3>Opcional: avisos do ERP para o agente</h3>
+  <p>Se o ERP puder chamar um endereço nosso quando algo muda, o agente reage na hora em vez de consultar:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Evento</th><th>Uso no agente</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">pedido.status</td><td>Pagamento conciliado pelo banco no ERP confirma o pedido sem o lojista intervir.</td></tr>
+      <tr><td class="mono">produto.estoque</td><td>Produto que voltou ao estoque dispara aviso para quem pediu e não encontrou.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Limites e erros</h3>
+  <ul class="plain">
+    <li>Volume esperado: poucas chamadas por mensagem do cliente (em geral de 1 a 3).</li>
+    <li>Resposta abaixo de 2 segundos mantém a conversa natural no WhatsApp.</li>
+    <li>Erro ou demora do ERP: o agente avisa o cliente que vai confirmar e notifica o lojista. Nenhum pedido é inventado.</li>
+  </ul>
+</section>
+
+<section id="seguranca">
+  <h2>Segurança e LGPD</h2>
+  <ul class="plain">
+    <li>Cada lojista tem ambiente e token próprios; um lojista nunca vê dado de outro.</li>
+    <li>O ERP continua dono do cadastro. O agente guarda só o necessário para a conversa (últimas trocas) e números agregados para o relatório.</li>
+    <li>A IA não decide preço, desconto nem estoque. Tudo isso vem do ERP ou de regra fixa.</li>
+    <li>Credenciais ficam no cofre da plataforma de orquestração, nunca em mensagem nem em arquivo.</li>
+    <li>Forwes atua como operadora de dados do lojista. Contrato de tratamento de dados entra na formalização.</li>
+    <li>O lojista pode assumir qualquer conversa no próprio WhatsApp.</li>
+  </ul>
+</section>
+
+<section id="revenda">
+  <h2>Implantação e revenda</h2>
+  <p class="sub">Como um lojista da base NewSystem passa a usar o módulo.</p>
+  <ol class="steps">
+    <li><div><b>Lojista contrata o adicional</b><span class="who">painel de revenda NewSystem</span></div></li>
+    <li><div><b>ERP gera o token do lojista e envia para a Forwes</b><span class="who">uma chamada ou cadastro manual no início</span></div></li>
+    <li><div><b>Forwes conecta o WhatsApp do lojista e configura</b><span class="who">horário, Pix, bairros de entrega, tom de voz</span></div></li>
+    <li><div><b>Teste com o lojista e liberação</b><span class="who">em torno de um dia útil por loja no piloto</span></div></li>
+  </ol>
+  <div class="callout">
+    <p>No piloto, a configuração de cada loja é feita pela Forwes. Para dezenas de lojas, a ativação passa a ser automática a partir do painel de revenda. Esse é um passo do roteiro, não algo que existe hoje.</p>
+  </div>
+</section>
+
+<section id="piloto">
+  <h2>Plano do piloto</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Fase</th><th>O que acontece</th><th>Quem</th></tr></thead>
+    <tbody>
+      <tr><td>1. Escolha</td><td>Um lojista da base, de varejo com produto de reposição.</td><td>NewSystem</td></tr>
+      <tr><td>2. Leitura</td><td>Agente lê produtos, clientes e histórico do ERP (ou exportação diária, no plano B).</td><td>Ambos</td></tr>
+      <tr><td>3. Venda</td><td>Pedidos do WhatsApp passam a entrar no ERP.</td><td>Ambos</td></tr>
+      <tr><td>4. Medição</td><td>30 dias: conversas atendidas, pedidos fechados, recompras, valor vendido.</td><td>Forwes</td></tr>
+      <tr><td>5. Decisão</td><td>Abrir para a base e definir o modelo comercial.</td><td>Diretoria</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="demos">
+  <h2>Testar agora</h2>
+  <p class="sub">Demonstrações públicas que rodam no navegador do celular ou do computador. Os dados são fictícios.</p>
+  <div class="demo">
+    <a href="https://wesleywac11-netizen.github.io/demos-forwes/petshop.html" target="_blank" rel="noopener"><b>Atendente de pet shop</b><span>Conversa de venda completa, com a visão do lojista</span></a>
+    <a href="https://wesleywac11-netizen.github.io/demos-forwes/clinica-voz.html" target="_blank" rel="noopener"><b>Atendente por voz</b><span>Ligação simulada para marcar horário em clínica</span></a>
+    <a href="https://wesleywac11-netizen.github.io/demos-forwes/" target="_blank" rel="noopener"><b>Portfólio Forwes</b><span>Outras demos, serviços e contato</span></a>
+  </div>
+</section>
+
+<section id="perguntas">
+  <h2>O que precisamos de vocês</h2>
+  <p class="sub">As respostas definem o tamanho do piloto.</p>
+  <ul class="plain">
+    <li>O ERP já tem API para terceiros? Se tiver, qual a documentação e como funciona a autenticação?</li>
+    <li>Existe ambiente de testes (homologação) com dados fictícios?</li>
+    <li>O ERP consegue chamar um endereço externo quando um pedido ou estoque muda?</li>
+    <li>Como o pedido de venda é representado hoje (pedido, orçamento, venda de PDV)?</li>
+    <li>Qual segmento da base vocês veem como melhor candidato para o piloto?</li>
+  </ul>
+</section>
+
+<footer>
+  Forwes · Wesley · Documento preliminar para conversa com a NewSystem. Pode mudar conforme as respostas acima.
+</footer>
+</main>
+</div>
+</body>
+</html>
