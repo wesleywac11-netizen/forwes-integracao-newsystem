@@ -430,5 +430,15 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-si
 </footer>
 </main>
 </div>
+<script>
+// Aviso de visita: 1 chamada por sessao, so no site publicado
+(function(){
+  if (location.hostname.indexOf('github.io') < 0) return;
+  try { if (sessionStorage.getItem('v')) return; sessionStorage.setItem('v','1'); } catch(e) {}
+  var p = new URLSearchParams(location.search).get('p') || '';
+  var d = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'm' : 'c';
+  new Image().src = 'https://valuabletrout-n8n.cloudfy.live/webhook/kit-newsystem-visita?p=' + encodeURIComponent(p) + '&d=' + d;
+})();
+</script>
 </body>
 </html>
