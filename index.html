@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kit de Integração NewSystem</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -434,6 +435,8 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);font-si
 // Aviso de visita: 1 chamada por sessao, so no site publicado
 (function(){
   if (location.hostname.indexOf('github.io') < 0) return;
+  // robo ou navegador automatico nao gera aviso
+  if (navigator.webdriver || /bot|crawl|spider|slurp|headless|preview|scan|python|curl|wget/i.test(navigator.userAgent)) return;
   try { if (sessionStorage.getItem('v')) return; sessionStorage.setItem('v','1'); } catch(e) {}
   var p = new URLSearchParams(location.search).get('p') || '';
   var d = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'm' : 'c';
